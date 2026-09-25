@@ -63,6 +63,7 @@ public class AuthService {
                         .description(user.getRole().getDescription())
                         .isActive(user.getRole().getIsActive())
                         .build())
+                .permissions(getMyPermissions(user.getUsername()))
                 .build();
     }
     

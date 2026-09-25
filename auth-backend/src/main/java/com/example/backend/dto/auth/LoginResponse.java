@@ -13,6 +13,7 @@ public class LoginResponse {
     private String token;
     private UserCheckDto userCheck;
     private RoleDto role;
+    private java.util.List<com.example.backend.dto.permission.PermissionResponse> permissions;
 
     @Data
     @Builder

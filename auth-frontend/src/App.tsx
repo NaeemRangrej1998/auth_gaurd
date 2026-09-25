@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
-import { PermissionProvider } from './context/Permissioncontext';
+// import { PermissionProvider } from './context/Permissioncontext';
 function App() {
   return (
     <BrowserRouter>
