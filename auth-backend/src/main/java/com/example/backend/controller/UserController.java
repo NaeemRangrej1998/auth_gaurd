@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -32,26 +33,35 @@ public class UserController {
     }
 
     @PreAuthorize("hasPermission('User', 'view')")
-    @GetMapping("/{id}")
+    @GetMapping("/paginated")
+    public ResponseEntity<Map<String, Object>> getPaginatedUsers(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search) {
+        return ResponseEntity.ok(userService.getPaginatedUsers(page, size, search));
+    }
+
+    @PreAuthorize("hasPermission('User', 'view')")
+    @GetMapping("/{id:\\d+}")
     public ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(new ApiResponse<>(200, "User fetched", userService.getUserById(id)));
     }
 
     @PreAuthorize("hasPermission('User', 'edit')")
-    @PutMapping("/{id}")
+    @PutMapping("/{id:\\d+}")
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(@PathVariable Long id, @Valid @RequestBody UserRequest request) {
         return ResponseEntity.ok(new ApiResponse<>(200, "User updated", userService.updateUser(id, request)));
     }
 
     @PreAuthorize("hasPermission('User', 'edit')")
-    @PatchMapping("/{id}/status")
+    @PatchMapping("/{id:\\d+}/status")
     public ResponseEntity<ApiResponse<Void>> updateUserStatus(@PathVariable Long id, @RequestParam Boolean isActive) {
         userService.updateUserStatus(id, isActive);
         return ResponseEntity.ok(new ApiResponse<>(200, "User status updated", null));
     }
 
     @PreAuthorize("hasPermission('User', 'delete')")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id:\\d+}")
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok(new ApiResponse<>(200, "User deleted", null));

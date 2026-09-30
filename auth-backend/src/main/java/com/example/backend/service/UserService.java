@@ -11,6 +11,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,6 +57,39 @@ public class UserService {
                 .filter(u -> !u.getIsDeleted())
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
+    }
+
+    public Map<String, Object> getPaginatedUsers(int page, int size, String search) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<User> userPage;
+        
+        if (search != null && !search.trim().isEmpty()) {
+            userPage = userRepository.searchUsers(search, pageable);
+        } else {
+            userPage = userRepository.findAllActive(pageable);
+        }
+
+        List<UserResponse> users = userPage.getContent().stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+
+        Map<String, Object> pages = new HashMap<>();
+        pages.put("totalPages", userPage.getTotalPages());
+        pages.put("currentPage", page);
+        pages.put("prevPage", userPage.hasPrevious() ? page - 1 : null);
+        pages.put("nextPage", userPage.hasNext() ? page + 1 : null);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("pages", pages);
+        data.put("users", users);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("code", 200);
+        response.put("message", "Users fetched successfully");
+        response.put("totalUsers", userPage.getTotalElements());
+        response.put("data", data);
+
+        return response;
     }
 
     public UserResponse getUserById(Long id) {

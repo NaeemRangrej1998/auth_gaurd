@@ -4,12 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { cookies, STORAGE_KEYS } from '../storage';
 import { loginUser } from '../service/login.api';
+import { useDispatch } from 'react-redux';
+import { setUsersData } from '../redux/slices/userSlice';
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
-
+    const dispatch = useDispatch()
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -32,8 +34,9 @@ const Login = () => {
             });
             if (response.code === 200) {
                 // Store auth token in cookie (backend nests it inside 'data')
+                dispatch(setUsersData(response.data.userCheck))
                 cookies.set(STORAGE_KEYS.AUTH_TOKEN, response.data.token);
-                
+
                 navigate("/");
 
                 toast.success(
