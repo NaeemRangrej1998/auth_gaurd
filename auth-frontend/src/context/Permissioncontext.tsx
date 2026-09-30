@@ -10,13 +10,15 @@ type AccessTypes = {
 };
 
 interface PermissionContextType {
-    hasRouteAccess: (moduleName: string, action: keyof AccessTypes) => boolean;
+    hasRouteAccess: (moduleName: number, action: keyof AccessTypes) => boolean;
     isLoading: boolean;
+    hasPermissions: (moduleName: number, action: keyof AccessTypes) => boolean;
 }
 
 const PermissionContext = createContext<PermissionContextType>({
     hasRouteAccess: () => false,
     isLoading: true,
+    hasPermissions: () => false,
 });
 
 export const PermissionProvider = ({ children }: { children: ReactNode }) => {
@@ -45,21 +47,38 @@ export const PermissionProvider = ({ children }: { children: ReactNode }) => {
         return () => clearTimeout(timeOut);
     }, []);
 
-    const hasRouteAccess = (moduleName: string, action: keyof AccessTypes): boolean => {
+    const hasRouteAccess = (moduleName: number, action: keyof AccessTypes): boolean => {
         if (isLoading) return false;
         const isSuperAdmin = false;
 
         // Find permission for the given module
-        const perm = permissions.find((p) => p.moduleName === moduleName || p.module?.moduleName === moduleName);
-
+        const perm = permissions.find((p) => p.moduleId === moduleName || p.module?.moduleId === moduleName);
+        console.log("moduleName",moduleName)
+        console.log(perm);
         if (!perm) return isSuperAdmin;
 
         try {
-            // Your backend returns accessTypes as a JSON string
             const accessTypes: AccessTypes = typeof perm.accessTypes === 'string'
                 ? JSON.parse(perm.accessTypes)
                 : perm.accessTypes;
 
+            return accessTypes[action] || isSuperAdmin;
+            
+        } catch (error) {
+            console.error("Error parsing access types:", error);
+            return isSuperAdmin;
+        }
+        
+    };
+    const hasPermissions = (moduleName: number, action: keyof AccessTypes) => {
+        if (isLoading) return false;
+        const isSuperAdmin = false;
+        const perm = permissions.find((p) => p.moduleId === moduleName || p.module?.moduleId === moduleName);
+        if (!perm) return isSuperAdmin;
+        try {
+            const accessTypes: AccessTypes = typeof perm.accessTypes === 'string'
+                ? JSON.parse(perm.accessTypes)
+                : perm.accessTypes;
             return accessTypes[action] || isSuperAdmin;
         } catch (error) {
             console.error("Error parsing access types:", error);
@@ -68,7 +87,7 @@ export const PermissionProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <PermissionContext.Provider value={{ hasRouteAccess, isLoading }}>
+        <PermissionContext.Provider value={{ hasRouteAccess, isLoading,hasPermissions }}>
             {isLoading ? <Loader /> : children}
         </PermissionContext.Provider>
     );

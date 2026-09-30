@@ -5,6 +5,8 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Users from './pages/Users';
 import Roles from './pages/Roles';
+import AreaTab from './pages/SettingsTabs/AreaTab';
+import RolePermissions from './pages/RolePermissions';
 // import { PermissionProvider } from './context/Permissioncontext';
 function App() {
   return (
@@ -15,7 +17,8 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="users" element={<Users />} />
           <Route path="roles" element={<Roles />} />
-          <Route path="settings" element={<div className="text-gray-600">Settings Page Placeholder</div>} />
+          <Route path="roles/:roleId/permissions" element={<RolePermissions />} />
+          <Route path="settings/area" element={<AreaTab />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

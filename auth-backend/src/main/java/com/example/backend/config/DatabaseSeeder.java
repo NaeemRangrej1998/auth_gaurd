@@ -41,7 +41,11 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .isActive(true)
                     .isDeleted(false)
                     .build();
-            userRepository.save(admin);
+            try {
+                userRepository.save(admin);
+            } catch (Exception e) {
+                System.out.println("Could not seed admin user due to duplicate email/username: " + e.getMessage());
+            }
         }
     }
 }

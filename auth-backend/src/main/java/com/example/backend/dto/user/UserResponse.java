@@ -13,6 +13,7 @@ public class UserResponse {
     private String lastName;
     private String email;
     private String roleName;
+    private Long roleId;
     private Boolean isActive;
     private Boolean isDeleted;
     private LocalDateTime createdAt;

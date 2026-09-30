@@ -12,3 +12,26 @@ export const getPaginatedUsers = (page: number, size: number, search?: string) =
         method: 'GET',
     });
 };
+
+export const createUser = (data: any) => {
+    return request({
+        url: BASE_URL,
+        method: 'POST',
+        body: data,
+    });
+};
+
+export const updateUser = (id: number, data: any) => {
+    return request({
+        url: `${BASE_URL}/${id}`,
+        method: 'PUT',
+        body: data,
+    });
+};
+
+export const deleteUser = (id: number) => {
+    return request({
+        url: `${BASE_URL}/${id}`,
+        method: 'DELETE',
+    });
+};

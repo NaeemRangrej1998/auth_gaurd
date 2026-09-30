@@ -37,14 +37,9 @@ api.interceptors.response.use(
   (error: AxiosError) => {
     if (error.response) {
       const status = error.response.status;
-      if (status === 1000 || status === 401) {
-        // if(timeout) clearTimeout(timeout)
-        // handleAxiosResponse(error)
-        // timeout=setTimeout(()=>{
-        //   window.location.href= '/'
-        //   count=1
-        // },1000)
+      if (status === 1000 || status === 401 || status === 403) {
         clearAllStorage();
+        window.location.href = '/login';
       } else throw error
     } else if (error.request) {
       console.error('No response received:', error.request);

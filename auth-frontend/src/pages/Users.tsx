@@ -1,8 +1,13 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import CommonTable from '../components/CommonTable/CommonTable';
 import Pagination from '../components/CommonTable/Pagination';
-import { getPaginatedUsers } from '../service/users.api';
+import { getPaginatedUsers, createUser, updateUser, deleteUser } from '../service/users.api';
 import { debounce } from '../util/helper/common';
+import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
+import UserModal from '../components/Modal/UserModal';
+import ConfirmModal from '../components/Modal/ConfirmModal';
+import { usePermission } from '../context/Permissioncontext';
+import { pageNames } from '../enum/Navigation';
 const columns = [
     {
         key: "id",
@@ -37,6 +42,12 @@ const Users = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
 
+    // Modal states
+    const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<any>(null);
+    const [isActionLoading, setIsActionLoading] = useState(false);
+    const { hasPermissions } = usePermission();
     const fetchUsersData = useCallback(async () => {
         setLoading(true);
         try {
@@ -69,33 +80,74 @@ const Users = () => {
         []
     );
 
-    // Edit
-    const handleEdit = (row) => {
-        console.log("Edit:", row);
+    // Add/Edit
+    const handleAdd = () => {
+        setSelectedUser(null);
+        setIsUserModalOpen(true);
+    };
+
+    const handleEdit = (row: any) => {
+        setSelectedUser(row);
+        setIsUserModalOpen(true);
+    };
+
+    const handleSaveUser = async (data: any) => {
+        setIsActionLoading(true);
+        try {
+            if (selectedUser) {
+                await updateUser(selectedUser.id, data);
+            } else {
+                await createUser(data);
+            }
+            setIsUserModalOpen(false);
+            fetchUsersData();
+        } catch (error) {
+            console.error("Failed to save user", error);
+        } finally {
+            setIsActionLoading(false);
+        }
     };
 
     // Delete
-    const handleDelete = (row) => {
-        console.log("Delete:", row);
+    const handleDelete = (row: any) => {
+        setSelectedUser(row);
+        setIsDeleteModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!selectedUser) return;
+        setIsActionLoading(true);
+        try {
+            await deleteUser(selectedUser.id);
+            setIsDeleteModalOpen(false);
+            fetchUsersData();
+        } catch (error) {
+            console.error("Failed to delete user", error);
+        } finally {
+            setIsActionLoading(false);
+        }
     };
 
     // Actions renderer
     const renderActions = (row, rowIdx) => {
         return (
             <div className="flex justify-center gap-2">
-                <button
-                    className="btn-primary"
-                    onClick={() => handleEdit(row)}
-                >
-                    Edit
-                </button>
-
-                <button
-                    className="btn-danger"
-                    onClick={() => handleDelete(row)}
-                >
-                    Delete
-                </button>
+                {(hasPermissions(pageNames.users, "edit")) && (
+                    <button
+                        className="text-blue-500 cursor-pointer text-lg"
+                        onClick={() => handleEdit(row)}
+                    >
+                        <FaEdit size={12} />
+                    </button>
+                )}
+                {(hasPermissions(pageNames.users, "delete")) && (
+                    <button
+                        className="text-red-500 cursor-pointer text-lg"
+                        onClick={() => handleDelete(row)}
+                    >
+                        <FaTrash size={12} />
+                    </button>
+                )}
             </div>
         );
     };
@@ -110,7 +162,18 @@ const Users = () => {
                         </span>
                     )}
                 </div>
-                <div>
+                <div className="flex items-center gap-4">
+                    {
+                        (hasPermissions(pageNames.users, "add")) && (
+                            <button
+                                onClick={handleAdd}
+                                className="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            >
+                                <FaPlus size={12} /> Add User
+                            </button>
+                        )
+                    }
+
                     <input
                         type="search"
                         placeholder="Search users..."
@@ -143,6 +206,23 @@ const Users = () => {
                     totalItems={totalItems}
                 />
             </div>
+
+            <UserModal
+                isOpen={isUserModalOpen}
+                onClose={() => setIsUserModalOpen(false)}
+                onSave={handleSaveUser}
+                user={selectedUser}
+                isLoading={isActionLoading}
+            />
+
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={confirmDelete}
+                title="Delete User"
+                message={`Are you sure you want to delete user "${selectedUser?.username}"? This action cannot be undone.`}
+                isLoading={isActionLoading}
+            />
         </div>
     )
 }

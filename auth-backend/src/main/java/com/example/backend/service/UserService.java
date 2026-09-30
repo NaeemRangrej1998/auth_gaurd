@@ -33,6 +33,9 @@ public class UserService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
+        if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+            throw new RuntimeException("Password is required for new users");
+        }
 
         Role role = roleRepository.findById(request.getRoleId())
                 .orElseThrow(() -> new RuntimeException("Role not found"));
@@ -142,6 +145,7 @@ public class UserService {
                 .lastName(user.getLastName())
                 .email(user.getEmail())
                 .roleName(user.getRole().getRoleName())
+                .roleId(user.getRole().getRoleId())
                 .isActive(user.getIsActive())
                 .isDeleted(user.getIsDeleted())
                 .createdAt(user.getCreatedAt())

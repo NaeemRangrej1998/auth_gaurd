@@ -6,6 +6,7 @@ import { cookies, STORAGE_KEYS } from '../storage';
 import { loginUser } from '../service/login.api';
 import { useDispatch } from 'react-redux';
 import { setUsersData } from '../redux/slices/userSlice';
+import { hasPageAccess } from '../util/helper/pageRedirect';
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -33,11 +34,13 @@ const Login = () => {
                 password,
             });
             if (response.code === 200) {
+                const isTrue = hasPageAccess(response?.data?.permissions, "view");
+                console.log("isTrue", isTrue);
                 // Store auth token in cookie (backend nests it inside 'data')
                 dispatch(setUsersData(response.data.userCheck))
                 cookies.set(STORAGE_KEYS.AUTH_TOKEN, response.data.token);
 
-                navigate("/");
+                navigate(isTrue);
 
                 toast.success(
                     `Hi, ${response.data?.userCheck?.firstName || ""} ${response.data?.userCheck?.lastName || ""}`
