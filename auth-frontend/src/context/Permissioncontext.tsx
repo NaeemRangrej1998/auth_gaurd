@@ -13,12 +13,14 @@ interface PermissionContextType {
     hasRouteAccess: (moduleName: number, action: keyof AccessTypes) => boolean;
     isLoading: boolean;
     hasPermissions: (moduleName: number, action: keyof AccessTypes) => boolean;
+    permissions: any[];
 }
 
 const PermissionContext = createContext<PermissionContextType>({
     hasRouteAccess: () => false,
     isLoading: true,
     hasPermissions: () => false,
+    permissions: []
 });
 
 export const PermissionProvider = ({ children }: { children: ReactNode }) => {
@@ -87,7 +89,7 @@ export const PermissionProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <PermissionContext.Provider value={{ hasRouteAccess, isLoading,hasPermissions }}>
+        <PermissionContext.Provider value={{ hasRouteAccess, isLoading,hasPermissions,permissions }}>
             {isLoading ? <Loader /> : children}
         </PermissionContext.Provider>
     );

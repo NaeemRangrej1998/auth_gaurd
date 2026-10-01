@@ -5,6 +5,7 @@ export const pageNames = {
     "users": 2,
     "roles": 3,
     "areas": 5,
+    "virtualtable": 6,
 } as const
 
 export const menuItems = [
@@ -19,4 +20,5 @@ export const menuItems = [
             { path: '/settings/area', name: 'Manage Area', pageName: pageNames.areas }
         ]
     },
+    { path: '/virtualtable', name: 'VirtualTable', icon: <FiShield />, pageName: pageNames.virtualtable },
 ];

@@ -7,6 +7,7 @@ import Users from './pages/Users';
 import Roles from './pages/Roles';
 import AreaTab from './pages/SettingsTabs/AreaTab';
 import RolePermissions from './pages/RolePermissions';
+import VirtualTable from './pages/VirtualTable';
 // import { PermissionProvider } from './context/Permissioncontext';
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="roles" element={<Roles />} />
           <Route path="roles/:roleId/permissions" element={<RolePermissions />} />
           <Route path="settings/area" element={<AreaTab />} />
+          <Route path="virtualtable" element={<VirtualTable />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
