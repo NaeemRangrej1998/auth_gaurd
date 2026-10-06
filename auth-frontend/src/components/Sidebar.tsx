@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import {  FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { usePermission } from '../context/Permissioncontext';
 import { menuItems } from '../enum/Navigation';
@@ -7,14 +7,39 @@ const Sidebar: React.FC = () => {
   const { hasRouteAccess } = usePermission();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openSubMenus, setOpenSubMenus] = useState<{ [key: string]: boolean }>({});
+  const location = useLocation();
+
+  useEffect(() => {
+    setOpenSubMenus(prev => {
+      const newState = { ...prev };
+      menuItems.forEach((item) => {
+        if (item.children) {
+          const isChildActive = item.children.some(child => location.pathname === child.path || location.pathname.startsWith(`${child.path}/`));
+          if (isChildActive) {
+            newState[item.name] = true;
+          } else {
+            newState[item.name] = false;
+          }
+        }
+      });
+      return newState;
+    });
+  }, [location.pathname]);
 
   const toggleSubMenu = (name: string) => {
-    setOpenSubMenus(prev => ({ ...prev, [name]: !prev[name] }));
+    setOpenSubMenus(prev => {
+      const newState = { ...prev };
+      Object.keys(newState).forEach(key => {
+        if (key !== name) newState[key] = false;
+      });
+      newState[name] = !prev[name];
+      return newState;
+    });
   };
 
 
   return (
-    <div className={`${isCollapsed ? 'w-20' : 'w-64'} transition-all duration-300 h-screen bg-white border-r border-gray-200 flex flex-col relative`}>
+    <aside className={`${isCollapsed ? 'w-20' : 'w-64'} transition-all duration-300 h-screen bg-white border-r border-gray-200 flex flex-col relative`}>
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
         className="absolute -right-3 top-6 bg-white border border-gray-200 rounded-full p-1 text-gray-500 hover:text-blue-600 shadow-sm z-10"
@@ -37,6 +62,7 @@ const Sidebar: React.FC = () => {
 
           if (item.children) {
             const isOpen = openSubMenus[item.name];
+
             return (
               <div key={item.name} className="flex flex-col">
                 <button
@@ -99,7 +125,7 @@ const Sidebar: React.FC = () => {
           );
         })}
       </nav>
-    </div>
+    </aside>
   );
 };
 

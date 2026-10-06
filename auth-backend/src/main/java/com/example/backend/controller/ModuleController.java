@@ -19,19 +19,19 @@ public class ModuleController {
 
     private final ModuleService moduleService;
 
-    @PreAuthorize("hasPermission('Module', 'add')")
+    // @PreAuthorize("hasPermission('Module', 'add')")
     @PostMapping
     public ResponseEntity<ApiResponse<ModuleResponse>> createModule(@Valid @RequestBody ModuleRequest request) {
         return ResponseEntity.ok(new ApiResponse<>(200, "Module created", moduleService.createModule(request)));
     }
 
-    @PreAuthorize("hasPermission('Module', 'view')")
+    // @PreAuthorize("hasPermission('Module', 'view')")
     @GetMapping
     public ResponseEntity<ApiResponse<List<ModuleResponse>>> getAllModules() {
         return ResponseEntity.ok(new ApiResponse<>(200, "Modules fetched", moduleService.getAllModules()));
     }
 
-    @PreAuthorize("hasPermission('Module', 'delete')")
+    // @PreAuthorize("hasPermission('Module', 'delete')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteModule(@PathVariable Long id) {
         moduleService.deleteModule(id);

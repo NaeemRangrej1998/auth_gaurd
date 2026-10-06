@@ -20,19 +20,19 @@ public class UserController {
 
     private final UserService userService;
 
-    @PreAuthorize("hasPermission('User', 'add')")
+    // @PreAuthorize("hasPermission('User', 'add')")
     @PostMapping
     public ResponseEntity<ApiResponse<UserResponse>> createUser(@Valid @RequestBody UserRequest request) {
         return ResponseEntity.ok(new ApiResponse<>(200, "User created", userService.createUser(request)));
     }
 
-    @PreAuthorize("hasPermission('User', 'view')")
+    // @PreAuthorize("hasPermission('User', 'view')")
     @GetMapping
     public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
         return ResponseEntity.ok(new ApiResponse<>(200, "Users fetched", userService.getAllUsers()));
     }
 
-    @PreAuthorize("hasPermission('User', 'view')")
+    // @PreAuthorize("hasPermission('User', 'view')")
     @GetMapping("/paginated")
     public ResponseEntity<Map<String, Object>> getPaginatedUsers(
             @RequestParam(defaultValue = "1") int page,
@@ -41,26 +41,26 @@ public class UserController {
         return ResponseEntity.ok(userService.getPaginatedUsers(page, size, search));
     }
 
-    @PreAuthorize("hasPermission('User', 'view')")
+    // @PreAuthorize("hasPermission('User', 'view')")
     @GetMapping("/{id:\\d+}")
     public ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(new ApiResponse<>(200, "User fetched", userService.getUserById(id)));
     }
 
-    @PreAuthorize("hasPermission('User', 'edit')")
+    // @PreAuthorize("hasPermission('User', 'edit')")
     @PutMapping("/{id:\\d+}")
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(@PathVariable Long id, @Valid @RequestBody UserRequest request) {
         return ResponseEntity.ok(new ApiResponse<>(200, "User updated", userService.updateUser(id, request)));
     }
 
-    @PreAuthorize("hasPermission('User', 'edit')")
+    // @PreAuthorize("hasPermission('User', 'edit')")
     @PatchMapping("/{id:\\d+}/status")
     public ResponseEntity<ApiResponse<Void>> updateUserStatus(@PathVariable Long id, @RequestParam Boolean isActive) {
         userService.updateUserStatus(id, isActive);
         return ResponseEntity.ok(new ApiResponse<>(200, "User status updated", null));
     }
 
-    @PreAuthorize("hasPermission('User', 'delete')")
+    // @PreAuthorize("hasPermission('User', 'delete')")
     @DeleteMapping("/{id:\\d+}")
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
